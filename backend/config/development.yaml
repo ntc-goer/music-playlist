@@ -1,0 +1,7 @@
+server_port: 8080
+database:
+  host: localhost
+  port: 27018
+  username: admin
+  password: Abc12345
+  db_name: musictrack_db
