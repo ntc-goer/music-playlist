@@ -3,6 +3,7 @@ import { RouteLink } from "./router";
 import "./index.css";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Notification from "./components/parts/Notification";
 
 const theme = createTheme({
   typography: {
@@ -17,9 +18,11 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <RouteLink />
-        </BrowserRouter>
+        <Notification>
+          <BrowserRouter>
+            <RouteLink />
+          </BrowserRouter>
+        </Notification>
       </QueryClientProvider>
     </ThemeProvider>
   );

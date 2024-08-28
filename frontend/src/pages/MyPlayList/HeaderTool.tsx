@@ -3,32 +3,28 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 interface PropsI {
-  openAddMusicTrackPopup: CallableFunction;
+  openCreatePlaylistPopup: CallableFunction;
   searchKeyword: string;
   setSearchKeyword: CallableFunction;
 }
-
 function HeaderTools({
-  openAddMusicTrackPopup,
+  openCreatePlaylistPopup,
   searchKeyword,
   setSearchKeyword,
 }: PropsI) {
-  const handleAddMusicTrack = () => {
-    openAddMusicTrackPopup(true);
-  };
   return (
     <Stack
       direction={"row"}
       justifyContent={"space-between"}
       sx={{ mt: "20px" }}
     >
-      <Box sx={{ fontSize: 30, fontWeight: "bold" }}>My Music</Box>
+      <Box sx={{ fontSize: 30, fontWeight: "bold" }}>My Playlist</Box>
       <Box>
         <TextField
           variant="outlined"
-          size="small"
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
+          size="small"
           sx={{
             minWidth: "300px",
             "& .MuiOutlinedInput-input": {
@@ -47,7 +43,7 @@ function HeaderTools({
               },
             },
           }}
-          placeholder="Search by title, artist, album, or genre"
+          placeholder="Search by name"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -73,11 +69,11 @@ function HeaderTools({
               boxShadow: "none",
             },
           }}
-          onClick={handleAddMusicTrack}
+          onClick={() => openCreatePlaylistPopup()}
         >
           <Stack direction={"row"} alignItems={"center"}>
             <AddOutlinedIcon sx={{ fontSize: 15 }} />
-            <Box>Upload Music</Box>
+            <Box>Create playlist</Box>
           </Stack>
         </Button>
       </Box>

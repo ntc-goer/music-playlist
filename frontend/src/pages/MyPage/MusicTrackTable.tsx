@@ -4,15 +4,15 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import image1 from "./../../assets/images/1.jpg";
-import image2 from "./../../assets/images/2.jpg";
-import image3 from "./../../assets/images/3.jpg";
-import image4 from "./../../assets/images/4.jpg";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { MusicTrack } from "../../models/music";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import { getFullUrl } from "../../ultis/common";
+import AddIcon from "@mui/icons-material/Add";
 
 interface Column {
   id: "name" | "album" | "genre" | "release" | "duration" | "action";
@@ -44,59 +44,32 @@ const columns: readonly Column[] = [
   },
   {
     id: "action",
-    label: "Edit/Delete",
+    label: "Action",
     minWidth: 170,
   },
 ];
 
+interface PropsI {
+  data?: MusicTrack[];
+  selectedSongId: string;
+  isSongPlaying: boolean;
+  onPlaySong?: CallableFunction;
+  onPauseSong?: CallableFunction;
+  onOpenDeletePopup?: CallableFunction;
+  onAddMusicPlaylist: CallableFunction;
+}
 
-const rows = [
-  {
-    id: 1,
-    name: "Night Tower",
-    thumbnail: image1,
-    artist: "HKT",
-    album: "Tinh nho",
-    genre: "Pop",
-    release: "1990",
-    duration: "60",
-  },
-  {
-    id: 2,
-    name: "Night Tower",
-    thumbnail: image2,
-    artist: "HKT",
-    album: "Tinh nho",
-    genre: "Pop",
-    release: "1990",
-    duration: "60",
-  },
-  {
-    id: 3,
-    name: "Night Tower",
-    thumbnail: image3,
-    artist: "HKT",
-    album: "Tinh nho",
-    genre: "Pop",
-    release: "1990",
-    duration: "60",
-  },
-  {
-    id: 4,
-    name: "Night Tower",
-    thumbnail: image4,
-    artist: "HKT",
-    album: "Tinh nho",
-    genre: "Pop",
-    release: "1990",
-    duration: "60",
-  },
-];
-
-export default function MusicTrackTable() {
-
-  const handleDeleteTrack = (id: number) => {
-    console.log(id);
+export default function MusicTrackTable({
+  data,
+  selectedSongId,
+  isSongPlaying,
+  onPlaySong,
+  onPauseSong,
+  onOpenDeletePopup,
+  onAddMusicPlaylist,
+}: PropsI) {
+  const handleDeleteTrack = (id: string) => {
+    onOpenDeletePopup && onOpenDeletePopup(id);
   };
   return (
     <Paper sx={{ width: "100%", overflow: "hidden", mt: "30px" }}>
@@ -116,13 +89,13 @@ export default function MusicTrackTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => {
+            {data?.map((row) => {
               return (
                 <TableRow hover tabIndex={-1} key={row.id}>
                   <TableCell align={"center"}>
                     <Stack direction={"row"} alignItems={"center"}>
                       <img
-                        src={row.thumbnail}
+                        src={getFullUrl(row.thumbnailName)}
                         style={{
                           width: "60px",
                           height: "60px",
@@ -130,7 +103,7 @@ export default function MusicTrackTable() {
                           marginRight: "10px",
                         }}
                       />
-                      <Box>
+                      <Stack direction={'column'} alignItems={'start'}>
                         <Typography
                           sx={{ fontSize: "17px", fontWeight: "bold" }}
                         >
@@ -139,7 +112,7 @@ export default function MusicTrackTable() {
                         <Typography sx={{ fontSize: "15px", color: "gray" }}>
                           {row.artist}
                         </Typography>
-                      </Box>
+                      </Stack>
                     </Stack>
                   </TableCell>
                   <TableCell align={"center"}>
@@ -154,7 +127,7 @@ export default function MusicTrackTable() {
                   </TableCell>
                   <TableCell align={"center"}>
                     <Typography sx={{ fontSize: "17px" }}>
-                      {row.release}
+                      {row.releaseYear}
                     </Typography>
                   </TableCell>
                   <TableCell align={"center"}>
@@ -163,6 +136,34 @@ export default function MusicTrackTable() {
                     </Typography>
                   </TableCell>
                   <TableCell align={"center"}>
+                    {selectedSongId === row.id && isSongPlaying ? (
+                      <IconButton
+                        onClick={() => onPauseSong && onPauseSong(row.id)}
+                      >
+                        <PauseIcon
+                          color="primary"
+                          sx={{ fontSize: "25px", cursor: "pointer" }}
+                        />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        onClick={() => onPlaySong && onPlaySong(row.id)}
+                      >
+                        <PlayArrowIcon
+                          color="primary"
+                          sx={{ fontSize: "25px", cursor: "pointer" }}
+                        />
+                      </IconButton>
+                    )}
+                    <Tooltip title="Add To Playlist">
+                      <IconButton onClick={() => onAddMusicPlaylist(row.id)}>
+                        <AddIcon
+                          color="primary"
+                          sx={{ fontSize: "25px", cursor: "pointer" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+
                     <IconButton>
                       <EditIcon
                         color="primary"
@@ -182,14 +183,14 @@ export default function MusicTrackTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
+      {/* <TablePagination
         component="div"
         count={rows.length}
         rowsPerPage={5}
         page={10}
         onPageChange={() => {}}
         onRowsPerPageChange={() => {}}
-      />
+      /> */}
     </Paper>
   );
 }

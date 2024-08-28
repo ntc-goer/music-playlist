@@ -19,6 +19,7 @@ type MongoDB struct {
 	Username       string   `json:"username"`
 	Password       string   `json:"password"`
 	Hosts          []string `json:"hosts"`
+	Port           string   `json:"port"`
 	Options        string   `json:"options"`
 	Database       string   `json:"database"`
 }
@@ -29,6 +30,7 @@ func NewMongoDB(c *config.Config) *MongoDB {
 		Password: c.Database.Password,
 		Hosts:    []string{c.Database.Host},
 		Database: c.Database.DBName,
+		Port:     c.Database.Port,
 	}
 }
 
@@ -37,7 +39,7 @@ func (m *MongoDB) Connect() (*mongo.Client, error) {
 
 	connectionStr := connectionStringTemplate
 
-	uri := fmt.Sprintf(connectionStr, m.Username, m.Password, m.Hosts[0], m.Database)
+	uri := fmt.Sprintf(connectionStr, m.Username, m.Password, fmt.Sprintf("%s:%s", m.Hosts[0], m.Port), m.Database)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

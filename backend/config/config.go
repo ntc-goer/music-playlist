@@ -16,6 +16,7 @@ type Database struct {
 type Config struct {
 	Database   Database `json:"database"`
 	ServerPort string   `json:"server_port"`
+	ApiPrefix  string   `json:"api_prefix"`
 }
 
 func Load() (*Config, error) {

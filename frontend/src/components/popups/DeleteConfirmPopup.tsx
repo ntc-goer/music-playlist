@@ -6,33 +6,42 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import { useDeleteMusicTrack } from "../../http/music/hook";
 
 interface PropsI {
-    open:  boolean
-    handleClose?: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void
+  songId: string;
+  onClose: CallableFunction;
+  refetchList: CallableFunction
+  message?: string;
 }
 
-function DeleteConfirmPopup({open, handleClose}: PropsI) {
+function DeleteConfirmPopup({
+  onClose,
+  message,
+  refetchList,
+  songId,
+}: PropsI) {
+  const deleteMusicTrack = useDeleteMusicTrack({onClose, refetchList});
+  const handleDeleteSong = () => {
+    deleteMusicTrack.mutate(songId);
+  };
   return (
     <Dialog
-      open={open}
-      onClose={handleClose}
+      open={Boolean(songId)}
+      onClose={() => onClose()}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">
-        {"Use Google's location service?"}
-      </DialogTitle>
+      <DialogTitle id="alert-dialog-title">Delete music</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Let Google help apps determine location. This means sending anonymous
-          location data to Google, even when no apps are running.
+          {message || "Do you want to delete this item ?"}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button>Disagree</Button>
-        <Button autoFocus>
-          Agree
+        <Button onClick={() => onClose()}>Cancel</Button>
+        <Button autoFocus onClick={handleDeleteSong}>
+          Delete
         </Button>
       </DialogActions>
     </Dialog>

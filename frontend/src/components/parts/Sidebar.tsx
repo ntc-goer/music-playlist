@@ -1,6 +1,22 @@
 import { Box, Stack } from "@mui/material";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
-function SideBar({width}: {width: number}) {
+import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import { useNavigate, useRoutes } from "react-router-dom";
+
+const SideBarItem = [
+  {
+    label: "My Music",
+    icon: FolderOpenIcon,
+    href: "/",
+  },
+  {
+    label: "My Playlist",
+    icon: PlaylistPlayIcon,
+    href: "/playlist",
+  },
+];
+function SideBar({ width }: { width: number }) {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -14,11 +30,31 @@ function SideBar({width}: {width: number}) {
         zIndex: 9,
       }}
     >
-      <Box sx={{fontWeight: "bold", fontSize: 25, mb: "20px", textAlign: "center"}}>EMVN</Box>
-      <Stack direction="row" justifyContent="center" alignItems="center" sx={{cursor: "pointer"}}>
-        <FolderOpenIcon sx={{mr: "5px", fontSize: "18px"}}/>
-        <Box>My Music</Box>
-      </Stack>
+      <Box
+        sx={{
+          fontWeight: "bold",
+          fontSize: 25,
+          mb: "20px",
+          textAlign: "center",
+        }}
+      >
+        EMVN
+      </Box>
+      {SideBarItem.map(({ label, icon: Icon, href }) => {
+        return (
+          <Stack
+            key={label}
+            direction="row"
+            justifyContent="start"
+            alignItems="center"
+            sx={{ cursor: "pointer", mb: "10px" }}
+            onClick={() => navigate(href)}
+          >
+            <Icon sx={{ mr: "5px", fontSize: "18px" }} />
+            <Box>{label}</Box>
+          </Stack>
+        );
+      })}
     </Box>
   );
 }

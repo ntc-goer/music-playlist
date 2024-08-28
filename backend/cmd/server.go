@@ -3,6 +3,7 @@ package cmd
 import (
 	"backend/config"
 	"backend/internal/musictrack"
+	"backend/internal/playlist"
 	"backend/internal/server"
 	"backend/pkg/database"
 	"context"
@@ -29,9 +30,15 @@ func provideCoreDependencies() *dig.Container {
 		return cfg
 	})
 
+	// Music track
 	c.Provide(musictrack.NewHandler)
 	c.Provide(musictrack.NewService)
 	c.Provide(musictrack.NewRepository)
+
+	// Playlist
+	c.Provide(playlist.NewHandler)
+	c.Provide(playlist.NewService)
+	c.Provide(playlist.NewRepository)
 
 	return c
 }

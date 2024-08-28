@@ -1,3 +1,4 @@
+name: "musictrack"
 services:
   mongo_db:
     container_name: musictrack_db

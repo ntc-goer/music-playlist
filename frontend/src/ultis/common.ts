@@ -16,6 +16,10 @@ async function convertFileToString(file: File | null) {
   }
 }
 
+function getFullUrl(path: string):string {
+  return `${import.meta.env.VITE_BACKEND_URL}/${path}`
+}
+
 function getFormDataFromJSON(obj: { [key: string]: any }): FormData {
   const formData = new FormData();
   for (const key in obj) {
@@ -39,4 +43,4 @@ function getFormDataFromJSON(obj: { [key: string]: any }): FormData {
   return formData;
 }
 
-export { convertFileToString, getFormDataFromJSON };
+export { convertFileToString, getFormDataFromJSON, getFullUrl };

@@ -7,7 +7,6 @@ import {
   Grid,
   Select,
   MenuItem,
-  Box,
   Typography,
   Stack,
 } from "@mui/material";
@@ -17,11 +16,12 @@ import ImageUpload from "../atomics/ImageUpload";
 import InputField from "../atomics/InputField";
 import InputRow from "../parts/InputRow";
 import { getFormDataFromJSON } from "../../ultis/common";
-import { useCreateMusicTrack } from "../../http/hook";
+import { useCreateMusicTrack } from "../../http/music/hook";
 
 interface PropsI {
   open: boolean;
-  handleClose?: (event: {}, reason: "backdropClick" | "escapeKeyDown") => void;
+  handleClose: CallableFunction;
+  refetchList: CallableFunction
 }
 
 const GENRE_DATA = [
@@ -41,7 +41,8 @@ const GENRE_DATA = [
   { value: "indie", label: "Indie" },
   { value: "punk", label: "Punk" },
 ];
-function AddMusicTrackPopup({ open, handleClose }: PropsI) {
+
+function AddMusicTrackPopup({ open, handleClose, refetchList }: PropsI) {
   const [musicTrack, setMusicTrack] = useState<{
     name: string;
     album: string;
@@ -62,7 +63,7 @@ function AddMusicTrackPopup({ open, handleClose }: PropsI) {
     duration: 0,
   });
 
-  const createMusicTrack = useCreateMusicTrack();
+  const createMusicTrack = useCreateMusicTrack(handleClose, refetchList);
   const handleAddMusicFile = (file: File) => {
     setMusicTrack({ ...musicTrack, file });
   };
@@ -73,10 +74,24 @@ function AddMusicTrackPopup({ open, handleClose }: PropsI) {
       formData,
     });
   };
+
+  const closeDialog = () => {
+    setMusicTrack({
+      name: "",
+      album: "",
+      artist: "",
+      file: null,
+      thumbnail: null,
+      genre: GENRE_DATA[0].value,
+      releaseYear: new Date().getFullYear(),
+      duration: 0,
+    });
+    handleClose && handleClose()
+  };
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={closeDialog}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       sx={{ padding: "10px" }}
@@ -111,7 +126,7 @@ function AddMusicTrackPopup({ open, handleClose }: PropsI) {
           </InputRow>
           <InputRow label="Genre">
             <Select
-              sx={{width: "100%"}}
+              sx={{ width: "100%" }}
               value={musicTrack.genre}
               onChange={(e) =>
                 setMusicTrack({ ...musicTrack, genre: e.target.value })

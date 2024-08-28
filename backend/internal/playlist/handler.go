@@ -1,4 +1,4 @@
-package musictrack
+package playlist
 
 import (
 	"backend/internal/utils"
@@ -29,24 +29,33 @@ func (h *Handler) Get(ctx *gin.Context) {
 }
 
 func (h *Handler) Create(ctx *gin.Context) {
-	var payload MusicTrack
+	var payload Playlist
 	if err := ctx.ShouldBind(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	songFileData, err := utils.FormFile(ctx, "file")
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	thumbnailData, _ := utils.FormFile(ctx, "thumbnail")
-	res, err := h.Service.CreateOne(ctx, &payload, songFileData, thumbnailData)
+	res, err := h.Service.CreateOne(ctx, &payload, thumbnailData)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, res)
+}
+
+func (h *Handler) AddTrack(ctx *gin.Context) {
+	var payload AddPlaylistPayload
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := h.Service.AddTrack(ctx, &payload)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
 func (h *Handler) Delete(ctx *gin.Context) {

@@ -1,4 +1,5 @@
 server_port: 8080
+api_prefix: v1
 database:
   host: localhost
   port: 27018

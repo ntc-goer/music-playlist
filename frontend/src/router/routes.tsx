@@ -1,6 +1,7 @@
 import { useRoutes } from "react-router-dom";
 import ContentLayout from "../layout/MainLayout";
 import MyPage from "../pages/MyPage";
+import MyPlayList from "../pages/MyPlayList";
 
 
 let routes = [
@@ -12,6 +13,11 @@ let routes = [
         path: "",
         name: "MyPage",
         element: <MyPage />,
+      },
+      {
+        path: "playlist",
+        name: "Playlist",
+        element: <MyPlayList />,
       },
     ],
   },
