@@ -12,7 +12,8 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import { getFullUrl } from "../../ultis/common";
 import { Playlist } from "../../models/playlist";
-import AddIcon from "@mui/icons-material/Add";
+import ListIcon from "@mui/icons-material/List";
+import defaultImage from "./../../assets/images/default_image.png"
 
 interface Column {
   id: "name" | "thumbnail" | "action";
@@ -29,17 +30,33 @@ const columns: readonly Column[] = [
   },
   {
     id: "action",
-    label: "Play/List/Edit/Delete",
+    label: "Action",
     minWidth: 170,
   },
 ];
 
 interface PropsI {
   data?: Playlist[];
-  onSelectAddPlaylistIcon: CallableFunction
+  isSongPlaying: boolean;
+  selectedPlaylistId?: string;
+  onPausePlaylist: CallableFunction;
+  onPlayPlaylist: CallableFunction;
+  onSelectShowItems: CallableFunction;
+  onEditPlaylist: CallableFunction;
 }
 
-export default function PlaylistTable({ data }: PropsI) {
+export default function PlaylistTable({
+  data,
+  isSongPlaying,
+  selectedPlaylistId,
+  onEditPlaylist,
+  onPlayPlaylist,
+  onPausePlaylist,
+  onSelectShowItems,
+}: PropsI) {
+  const handleShowList = (id: string) => {
+    onSelectShowItems(id);
+  };
   return (
     <Paper sx={{ width: "100%", overflow: "hidden", mt: "30px" }}>
       <TableContainer sx={{ maxHeight: 700 }}>
@@ -70,7 +87,7 @@ export default function PlaylistTable({ data }: PropsI) {
                   </TableCell>
                   <TableCell align={"center"}>
                     <img
-                      src={getFullUrl(row.thumbnailPath)}
+                      src={row.thumbnailPath ? getFullUrl(row.thumbnailPath): defaultImage}
                       style={{
                         width: "60px",
                         height: "60px",
@@ -81,28 +98,52 @@ export default function PlaylistTable({ data }: PropsI) {
                   </TableCell>
 
                   <TableCell align={"center"}>
-                    <IconButton>
-                      <PlayArrowIcon
-                        color="primary"
-                        sx={{ fontSize: "25px", cursor: "pointer" }}
-                      />
-                    </IconButton>
-                    <Tooltip title="Edit playlist">
-                        <IconButton>
-                      <EditIcon
-                        color="primary"
-                        sx={{ fontSize: "25px", cursor: "pointer" }}
-                      />
-                    </IconButton>
+                    <Tooltip title="Play playlist">
+                      {selectedPlaylistId === row.id && isSongPlaying ? (
+                        <IconButton onClick={() => onPausePlaylist(row.id)}>
+                          <PauseIcon
+                            color="primary"
+                            sx={{ fontSize: "25px", cursor: "pointer" }}
+                          />
+                        </IconButton>
+                      ) : (
+                        <IconButton onClick={() => onPlayPlaylist(row.id)}>
+                          <PlayArrowIcon
+                            color="primary"
+                            sx={{ fontSize: "25px", cursor: "pointer" }}
+                          />
+                        </IconButton>
+                      )}
                     </Tooltip>
-                    
+
+                    <Tooltip title="Show list">
+                      <IconButton onClick={() => handleShowList(row.id)}>
+                        <ListIcon
+                          color="primary"
+                          sx={{ fontSize: "25px", cursor: "pointer" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit playlist">
+                      <IconButton onClick={() => onEditPlaylist(row)}>
+                        <EditIcon
+                          color="primary"
+                          sx={{ fontSize: "25px", cursor: "pointer" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+
                     <Tooltip title="Delete playlist">
-                        <IconButton>
-                      <DeleteIcon
-                        color="error"
-                        sx={{ fontSize: "25px", ml: "5px", cursor: "pointer" }}
-                      />
-                    </IconButton>
+                      <IconButton>
+                        <DeleteIcon
+                          color="error"
+                          sx={{
+                            fontSize: "25px",
+                            ml: "5px",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </IconButton>
                     </Tooltip>
                   </TableCell>
                 </TableRow>

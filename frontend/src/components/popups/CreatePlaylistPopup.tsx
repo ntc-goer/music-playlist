@@ -6,32 +6,53 @@ import {
   Button,
   Grid,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InputField from "../atomics/InputField";
 import InputRow from "../parts/InputRow";
 import ImageUpload from "../atomics/ImageUpload";
-import { getFormDataFromJSON } from "../../ultis/common";
-import { useCreatePlaylist } from "../../http/playlist/hook";
+import { getFormDataFromJSON, getFullUrl } from "../../ultis/common";
+import { useCreatePlaylist, useUpdatePlaylist } from "../../http/playlist/hook";
+import { Playlist } from "../../models/playlist";
 
 interface PropsI {
   open: boolean;
+  editPlaylistItem?: Playlist | null;
   handleClose: CallableFunction;
-  refetchList: CallableFunction
+  refetchList: CallableFunction;
 }
 
-function CreatePlaylistPopup({ open, handleClose, refetchList }: PropsI) {
+function CreatePlaylistPopup({
+  open,
+  handleClose,
+  refetchList,
+  editPlaylistItem,
+}: PropsI) {
   const [playlist, setPlaylist] = useState<{
+    id: string;
     name: string;
-    thumbnail: File | null;
+    thumbnail: File | null | string;
   }>({
+    id: "",
     name: "",
     thumbnail: null,
   });
 
-  const createPlaylist = useCreatePlaylist(handleClose, refetchList)
+  const createPlaylist = useCreatePlaylist(handleClose, refetchList);
+  const updatePlaylist = useUpdatePlaylist(handleClose, refetchList)
+  
+  useEffect(() => {
+    if (editPlaylistItem && editPlaylistItem.id) {
+      setPlaylist({
+        id: editPlaylistItem.id,
+        name: editPlaylistItem.name,
+        thumbnail: getFullUrl(editPlaylistItem.thumbnailPath),
+      });
+    }
+  }, [editPlaylistItem]);
 
   const closeDialog = () => {
     setPlaylist({
+      id: "",
       name: "",
       thumbnail: null,
     });
@@ -40,9 +61,15 @@ function CreatePlaylistPopup({ open, handleClose, refetchList }: PropsI) {
 
   const handleCreatePlaylist = () => {
     const formData = getFormDataFromJSON(playlist);
-    createPlaylist.mutate({
-      formData,
-    });
+    if (playlist.id) {
+      updatePlaylist.mutate({
+        formData,
+      });
+    } else {
+      createPlaylist.mutate({
+        formData,
+      });
+    }
   };
 
   return (
@@ -80,7 +107,7 @@ function CreatePlaylistPopup({ open, handleClose, refetchList }: PropsI) {
           sx={{ padding: "10px 50px" }}
           onClick={handleCreatePlaylist}
         >
-          Create
+          {playlist.id ? "Edit" : "Create"}
         </Button>
       </DialogActions>
     </Dialog>

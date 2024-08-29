@@ -13,10 +13,17 @@ type Database struct {
 	Password string `json:"password"`
 	DBName   string `json:"db_name"`
 }
+
+type FilePath struct {
+	Thumbnail  string `json:"thumbnail"`
+	MusicTrack string `json:"music_track"`
+}
+
 type Config struct {
 	Database   Database `json:"database"`
 	ServerPort string   `json:"server_port"`
 	ApiPrefix  string   `json:"api_prefix"`
+	FilePath   FilePath `json:"file_path"`
 }
 
 func Load() (*Config, error) {

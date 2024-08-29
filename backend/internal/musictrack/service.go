@@ -40,21 +40,75 @@ func (s *Service) Get(ctx context.Context, keyword string, opts *options.FindOpt
 	return tracks, nil
 }
 
+func (s *Service) GetById(ctx context.Context, id primitive.ObjectID) (*MusicTrack, error) {
+	track, err := s.Repository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	track.ThumbnailName = fmt.Sprintf("thumbnails/%s", track.ThumbnailName)
+	track.SongFileName = fmt.Sprintf("songs/%s", track.SongFileName)
+
+	return track, nil
+}
+
 func (s *Service) CreateOne(ctx context.Context, data *MusicTrack, songFile *utils.FileData, thumbnail *utils.FileData) (*MusicTrack, error) {
 	data.SongFileName = utils.GenFileName(songFile.Header.Filename)
 	err := utils.SaveFile("data/songs", data.SongFileName, songFile.Data)
 	if err != nil {
 		return nil, err
 	}
-	if thumbnail != nil {
+	if thumbnail.Header != nil {
 		data.ThumbnailName = utils.GenFileName(thumbnail.Header.Filename)
-		err := utils.SaveFile("data/thumbnails", data.ThumbnailName, thumbnail.Data)
+		err := utils.SaveFile(s.Config.FilePath.Thumbnail, data.ThumbnailName, thumbnail.Data)
 		if err != nil {
 			return nil, err
 		}
 	}
 	res, err := s.Repository.Create(ctx, data)
 	return res, err
+}
+
+func (s *Service) UpdateOne(ctx context.Context, data *MusicTrack, songFile *utils.FileData, thumbnail *utils.FileData) (*MusicTrack, error) {
+	// get updated music track
+	track, err := s.Repository.GetById(ctx, data.ID)
+	if err != nil {
+		return nil, err
+	}
+	if data.File == "" && songFile.Header != nil {
+		// Remove old file
+		if err := os.Remove(filepath.Join(s.Config.FilePath.MusicTrack, track.SongFileName)); err != nil {
+			log.Printf("Delete song error %s", err.Error())
+		}
+		// Upload new file
+		track.SongFileName = utils.GenFileName(songFile.Header.Filename)
+		err := utils.SaveFile(s.Config.FilePath.MusicTrack, track.SongFileName, songFile.Data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if data.Thumbnail == "" && thumbnail.Header != nil {
+		// Remove old file
+		if err := os.Remove(filepath.Join(s.Config.FilePath.Thumbnail, track.ThumbnailName)); err != nil {
+			log.Printf("Delete song error %s", err.Error())
+		}
+		// Upload new file
+		track.ThumbnailName = utils.GenFileName(thumbnail.Header.Filename)
+		err := utils.SaveFile(s.Config.FilePath.Thumbnail, track.ThumbnailName, thumbnail.Data)
+		if err != nil {
+			return nil, err
+		}
+	}
+	// Update old track
+	track.Name = data.Name
+	track.Album = data.Album
+	track.Artist = data.Artist
+	track.Genre = data.Genre
+	track.ReleaseYear = data.ReleaseYear
+	track.Duration = data.Duration
+
+	newTrack, err := s.Repository.UpdateOne(ctx, track)
+	return newTrack, err
 }
 
 func (s *Service) DeleteById(ctx context.Context, id primitive.ObjectID) error {
@@ -64,13 +118,13 @@ func (s *Service) DeleteById(ctx context.Context, id primitive.ObjectID) error {
 	}
 	if song.ThumbnailName != "" {
 		// Delete thumbnail
-		if err := os.Remove(filepath.Join("data/thumbnails", song.ThumbnailName)); err != nil {
+		if err := os.Remove(filepath.Join(s.Config.FilePath.Thumbnail, song.ThumbnailName)); err != nil {
 			log.Printf("Delete thumbnail error %s", err.Error())
 		}
 	}
 	if song.SongFileName != "" {
 		// Delete song
-		if err := os.Remove(filepath.Join("data/songs", song.SongFileName)); err != nil {
+		if err := os.Remove(filepath.Join(s.Config.FilePath.MusicTrack, song.SongFileName)); err != nil {
 			log.Printf("Delete song file error %s", err.Error())
 		}
 	}

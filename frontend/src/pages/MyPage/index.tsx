@@ -25,6 +25,7 @@ function MyPage() {
   const [isAddMusicTrackOpen, setIsAddMusicTrackOpen] = useState(false);
 
   const [addPlaylistMusicId, setAddPlaylistMusicId] = useState("");
+  const [editTrack, setEditTrack] = useState<MusicTrack | null>(null);
 
   useEffect(() => {
     if (timeOut) {
@@ -63,7 +64,7 @@ function MyPage() {
   };
 
   const disableNext = useMemo(() => {
-    if(!data) return false
+    if (!data) return false;
     const currentIndex = data.findIndex(
       (item: MusicTrack) => item.id === selectedSongId
     );
@@ -71,12 +72,13 @@ function MyPage() {
   }, [selectedSongId]);
 
   const disableBefore = useMemo(() => {
-    if(!data) return false
+    if (!data) return false;
     const currentIndex = data.findIndex(
       (item: MusicTrack) => item.id === selectedSongId
     );
     return currentIndex === 0;
   }, [selectedSongId]);
+
   return (
     <Box>
       <HeaderTools
@@ -94,11 +96,18 @@ function MyPage() {
           setIsSelectedSongPlaying(true);
         }}
         onAddMusicPlaylist={setAddPlaylistMusicId}
+        onEditTrack={(row: MusicTrack) => {
+          setEditTrack(row)
+          setIsAddMusicTrackOpen(true)
+        }}
         onOpenDeletePopup={(id: string) => setSelectedDeleteSongId(id)}
       />
+      {/* Popup */}
       <AddMusicTrackPopup
         open={isAddMusicTrackOpen}
+        editTrackItem={editTrack}
         handleClose={() => {
+          setEditTrack(null)
           setIsAddMusicTrackOpen(false);
         }}
         refetchList={refetch}

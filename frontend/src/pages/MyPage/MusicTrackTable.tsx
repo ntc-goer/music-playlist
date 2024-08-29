@@ -5,7 +5,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { MusicTrack } from "../../models/music";
@@ -13,6 +13,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import { getFullUrl } from "../../ultis/common";
 import AddIcon from "@mui/icons-material/Add";
+import defaultImage from "./../../assets/images/default_image.png"
 
 interface Column {
   id: "name" | "album" | "genre" | "release" | "duration" | "action";
@@ -55,6 +56,7 @@ interface PropsI {
   isSongPlaying: boolean;
   onPlaySong?: CallableFunction;
   onPauseSong?: CallableFunction;
+  onEditTrack: CallableFunction;
   onOpenDeletePopup?: CallableFunction;
   onAddMusicPlaylist: CallableFunction;
 }
@@ -65,6 +67,7 @@ export default function MusicTrackTable({
   isSongPlaying,
   onPlaySong,
   onPauseSong,
+  onEditTrack,
   onOpenDeletePopup,
   onAddMusicPlaylist,
 }: PropsI) {
@@ -95,7 +98,7 @@ export default function MusicTrackTable({
                   <TableCell align={"center"}>
                     <Stack direction={"row"} alignItems={"center"}>
                       <img
-                        src={getFullUrl(row.thumbnailName)}
+                        src={row.thumbnailName ? getFullUrl(row.thumbnailName): defaultImage}
                         style={{
                           width: "60px",
                           height: "60px",
@@ -103,7 +106,7 @@ export default function MusicTrackTable({
                           marginRight: "10px",
                         }}
                       />
-                      <Stack direction={'column'} alignItems={'start'}>
+                      <Stack direction={"column"} alignItems={"start"}>
                         <Typography
                           sx={{ fontSize: "17px", fontWeight: "bold" }}
                         >
@@ -163,19 +166,26 @@ export default function MusicTrackTable({
                         />
                       </IconButton>
                     </Tooltip>
-
-                    <IconButton>
-                      <EditIcon
-                        color="primary"
-                        sx={{ fontSize: "25px", cursor: "pointer" }}
-                      />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteTrack(row.id)}>
-                      <DeleteIcon
-                        color="error"
-                        sx={{ fontSize: "25px", ml: "5px", cursor: "pointer" }}
-                      />
-                    </IconButton>
+                    <Tooltip title="Edit">
+                      <IconButton onClick={() => onEditTrack(row)}>
+                        <EditIcon
+                          color="primary"
+                          sx={{ fontSize: "25px", cursor: "pointer" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton onClick={() => handleDeleteTrack(row.id)}>
+                        <DeleteIcon
+                          color="error"
+                          sx={{
+                            fontSize: "25px",
+                            ml: "5px",
+                            cursor: "pointer",
+                          }}
+                        />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               );

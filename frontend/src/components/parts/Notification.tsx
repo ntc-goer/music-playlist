@@ -30,7 +30,7 @@ function Notification({ children }: { children: ReactNode }) {
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           open={Boolean(successMsg || errorMsg)}
           onClose={handleClose}
-          autoHideDuration={1000}
+          autoHideDuration={2000}
         >
           <Alert severity="success">
             <AlertTitle>Success</AlertTitle>
@@ -43,7 +43,8 @@ function Notification({ children }: { children: ReactNode }) {
         <Snackbar
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           open={Boolean(successMsg || errorMsg)}
-          autoHideDuration={6000}
+          onClose={handleClose}
+          autoHideDuration={2000}
         >
           <Alert severity="error">
             <AlertTitle>Error</AlertTitle>

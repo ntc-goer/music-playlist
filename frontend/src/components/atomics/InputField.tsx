@@ -5,13 +5,16 @@ interface PropsI {
   value: string | number;
   onChange?: CallableFunction;
   placeholder?: string;
+  errorText?: string
 }
-function InputField({ value, placeholder, onChange, type = "text" }: PropsI) {
+function InputField({ value, placeholder, onChange, type = "text", errorText = "" }: PropsI) {
   const handleChange = (e: { target: { value: string } }) => {
     onChange && onChange(e.target.value);
   };
   return (
     <TextField
+      error={Boolean(errorText)}
+      helperText={errorText}
       type={type}
       variant="standard"
       sx={{

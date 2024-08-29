@@ -38,8 +38,8 @@ func (c *CoreHTTPServer) AddCoreRouter() {
 
 	v1 := c.Engine.Group(c.Config.ApiPrefix)
 
-	v1.Static("/thumbnails", "./data/thumbnails")
-	v1.Static("/songs", "./data/songs")
+	v1.Static("/thumbnails", c.Config.FilePath.Thumbnail)
+	v1.Static("/songs", c.Config.FilePath.MusicTrack)
 
 	v1.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -47,10 +47,14 @@ func (c *CoreHTTPServer) AddCoreRouter() {
 		})
 	})
 	v1.GET("/music", c.MusicTrack.Get)
+	v1.GET("/music/:id", c.MusicTrack.GetById)
+	v1.PUT("/music", c.MusicTrack.Update)
 	v1.POST("/music", c.MusicTrack.Create)
 	v1.DELETE("/music/:id", c.MusicTrack.Delete)
 
 	v1.GET("/playlist", c.Playlist.Get)
+	v1.GET("/playlist/:id", c.Playlist.GetById)
+	v1.PUT("/playlist", c.Playlist.Update)
 	v1.POST("/playlist", c.Playlist.Create)
 	v1.POST("/playlist/add", c.Playlist.AddTrack)
 }

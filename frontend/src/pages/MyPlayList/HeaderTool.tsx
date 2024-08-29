@@ -36,10 +36,10 @@ function HeaderTools({
             "& .MuiOutlinedInput-root": {
               borderRadius: 25,
               "&:hover fieldset": {
-                borderColor: "#FCCCFF", // Border color on hover
+                borderColor: "#1976d27d", // Border color on hover
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#FCCCFF", // Border color when focused
+                borderColor: "#1976d27d", // Border color when focused
               },
             },
           }}
@@ -57,7 +57,7 @@ function HeaderTools({
           sx={{
             fontWeight: "bold",
             ml: "20px",
-            backgroundColor: "#FCCCFF",
+            backgroundColor: "#1976d27d",
             color: "black",
             borderRadius: "15px",
             fontSize: 14,
@@ -65,7 +65,7 @@ function HeaderTools({
             padding: "5px 15px",
             verticalAlign: "center",
             "&:hover": {
-              backgroundColor: "#f5b0f9",
+              backgroundColor: "#1976d27d",
               boxShadow: "none",
             },
           }}

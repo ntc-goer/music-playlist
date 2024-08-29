@@ -6,3 +6,7 @@ database:
   username: admin
   password: Abc12345
   db_name: musictrack_db
+
+file_path:
+  thumbnail: data/thumbnails
+  music_track: data/songs

@@ -1,24 +1,23 @@
-import { useRef, useState } from "react";
-import { Button, Stack } from "@mui/material";
+import { useRef } from "react";
+import { Button, Stack, Typography } from "@mui/material";
 
 interface PropsI {
   onChange?: CallableFunction;
   label?: string;
   accept?: string;
   isShowFileName?: boolean;
+  errorText?: string
 }
 
 function InputFile(props: PropsI) {
-  const [file, setFile] = useState<File>();
   const inputFileRef = useRef<HTMLInputElement>(null);
-  const { onChange, accept } = props;
+  const { onChange, accept, errorText = "" } = props;
 
   const handleClick = () => {
     inputFileRef.current?.click();
   };
   const handleChange = (e: any) => {
     const fileE = e.target.files[0];
-    setFile(fileE);
     onChange && onChange(fileE);
   };
   return (
@@ -30,7 +29,9 @@ function InputFile(props: PropsI) {
       >
         Select file
       </Button>
-
+      {
+        errorText && <Typography sx={{color: "#d32f2f", fontWeight: 400, fontSize: "16px"}}>{errorText}</Typography>
+      }
       <input
         type="file"
         hidden

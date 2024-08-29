@@ -28,6 +28,21 @@ func (h *Handler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+func (h *Handler) GetById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	res, err := h.Service.GetById(ctx, objId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, res)
+}
+
 func (h *Handler) Create(ctx *gin.Context) {
 	var payload MusicTrack
 	if err := ctx.ShouldBind(&payload); err != nil {
@@ -42,6 +57,30 @@ func (h *Handler) Create(ctx *gin.Context) {
 	}
 	thumbnailData, _ := utils.FormFile(ctx, "thumbnail")
 	res, err := h.Service.CreateOne(ctx, &payload, songFileData, thumbnailData)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (h *Handler) Update(ctx *gin.Context) {
+	var payload MusicTrack
+	if err := ctx.ShouldBind(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var err error
+	payload.ID, err = primitive.ObjectIDFromHex(payload.StringID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	payload.File = ctx.PostForm("file")
+	songFileData, _ := utils.FormFile(ctx, "file")
+	payload.Thumbnail = ctx.PostForm("thumbnail")
+	thumbnailData, _ := utils.FormFile(ctx, "thumbnail")
+	res, err := h.Service.UpdateOne(ctx, &payload, songFileData, thumbnailData)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

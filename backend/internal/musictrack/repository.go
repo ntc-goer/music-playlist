@@ -66,3 +66,16 @@ func (r *Repository) Create(ctx context.Context, data *MusicTrack) (*MusicTrack,
 	data.ID = res.InsertedID.(primitive.ObjectID)
 	return data, nil
 }
+
+func (r *Repository) UpdateOne(ctx context.Context, data *MusicTrack) (*MusicTrack, error) {
+	data.UpdatedAt = time.Now().UTC()
+	_, err := r.Collection.UpdateOne(ctx, bson.M{
+		"_id": data.ID,
+	}, bson.M{
+		"$set": data,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}

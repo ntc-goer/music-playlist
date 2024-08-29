@@ -1,7 +1,7 @@
 import { Box, Stack } from "@mui/material";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
-import { useNavigate, useRoutes } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const SideBarItem = [
   {
@@ -17,6 +17,7 @@ const SideBarItem = [
 ];
 function SideBar({ width }: { width: number }) {
   const navigate = useNavigate();
+  const location = useLocation();
   return (
     <Box
       sx={{
@@ -38,7 +39,7 @@ function SideBar({ width }: { width: number }) {
           textAlign: "center",
         }}
       >
-        EMVN
+        MYEMVN
       </Box>
       {SideBarItem.map(({ label, icon: Icon, href }) => {
         return (
@@ -50,8 +51,10 @@ function SideBar({ width }: { width: number }) {
             sx={{ cursor: "pointer", mb: "10px" }}
             onClick={() => navigate(href)}
           >
-            <Icon sx={{ mr: "5px", fontSize: "18px" }} />
-            <Box>{label}</Box>
+            <Icon sx={{ mr: "5px", fontSize: "18px", color: location.pathname == href ? "#1976d27d" : "" }} />
+            <Box sx={{ color: location.pathname == href ? "#1976d27d" : "" }}>
+              {label}
+            </Box>
           </Stack>
         );
       })}

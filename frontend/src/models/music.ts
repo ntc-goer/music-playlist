@@ -10,6 +10,9 @@ interface MusicTrack {
     duration: number
     createdAt: Date
     updatedAt?: Date
+    // Addtional
+    // file?: File | null
+    // thumbnail?: File | null
 }
 
 export {

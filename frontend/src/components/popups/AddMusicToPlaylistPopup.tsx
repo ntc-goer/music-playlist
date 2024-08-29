@@ -9,19 +9,16 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getFullUrl } from "../../ultis/common";
-import {
-  useAddPlaylistMusic,
-  useGetPlaylists,
-} from "../../http/playlist/hook";
+import { useAddPlaylistMusic, useGetPlaylists } from "../../http/playlist/hook";
 import { Playlist } from "../../models/playlist";
 
 interface PropsI {
   open: boolean;
   musicId: string;
   handleClose?: CallableFunction;
-  refetchList: CallableFunction
+  refetchList: CallableFunction;
 }
 
 function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
@@ -36,6 +33,18 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
     playlistIds: [],
   });
 
+  useEffect(() => {
+    if (data) {
+      const ids = data
+        .filter((item: Playlist) => item.songList?.includes(musicId))
+        ?.map((item: Playlist) => item.id);
+      setAddPlaylistData({
+        ...addPlaylistData,
+        musicId,
+        playlistIds: ids,
+      });
+    }
+  }, [data, musicId]);
   const onToggleCheckbox = (playlistId: string, checked: boolean) => {
     if (!addPlaylistData.playlistIds.includes(playlistId) && checked) {
       setAddPlaylistData({
@@ -50,6 +59,7 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
       setAddPlaylistData({ ...addPlaylistData, playlistIds: newPlaylistIds });
     }
   };
+
   const closeDialog = () => {
     setAddPlaylistData({
       musicId: "",
@@ -95,7 +105,8 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
                 <Typography sx={{ ml: "10px" }}>{item.name}</Typography>
               </Stack>
               <Checkbox
-                onChange={(e, checked) => onToggleCheckbox(item.id, checked)}
+                checked={addPlaylistData.playlistIds.includes(item.id)}
+                onChange={(_e, checked) => onToggleCheckbox(item.id, checked)}
               />
             </Stack>
           ))}

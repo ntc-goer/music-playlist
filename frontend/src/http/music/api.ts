@@ -8,11 +8,31 @@ async function createMusicTrack(form: FormData) {
   });
 }
 
+async function updateMusicTrack(form: FormData) {
+  return await instance.put("/music", form, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
 async function getMusicTracks(page: number, pageSize: number, keyword: string) {
-  return await instance.get(`/music?page=${page}&pageSize=${pageSize}&keyword=${keyword}`);
+  return await instance.get(
+    `/music?page=${page}&pageSize=${pageSize}&keyword=${keyword}`
+  );
 }
 
 async function deleteMusicTrack(id: string) {
-  return await instance.delete(`/music/${id}`)
+  return await instance.delete(`/music/${id}`);
 }
-export { createMusicTrack, getMusicTracks,deleteMusicTrack };
+
+async function getMusicById(id: string) {
+  return await instance.get(`/music/${id}`);
+}
+export {
+  createMusicTrack,
+  getMusicTracks,
+  deleteMusicTrack,
+  updateMusicTrack,
+  getMusicById,
+};

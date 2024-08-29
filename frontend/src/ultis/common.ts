@@ -16,8 +16,9 @@ async function convertFileToString(file: File | null) {
   }
 }
 
-function getFullUrl(path: string):string {
-  return `${import.meta.env.VITE_BACKEND_URL}/${path}`
+function getFullUrl(path: string): string {
+  if(!path) return ""
+  return `${import.meta.env.VITE_BACKEND_URL}/${path}`;
 }
 
 function getFormDataFromJSON(obj: { [key: string]: any }): FormData {
@@ -43,4 +44,16 @@ function getFormDataFromJSON(obj: { [key: string]: any }): FormData {
   return formData;
 }
 
-export { convertFileToString, getFormDataFromJSON, getFullUrl };
+function formatMusicTime(time: number): string {
+  const minute = Math.floor(time / 60);
+  const second = Math.ceil(time % 60);
+  return `${minute < 10 ? `0${minute}` : minute}:${
+    second < 10 ? `0${second}` : second
+  }`;
+}
+export {
+  convertFileToString,
+  getFormDataFromJSON,
+  getFullUrl,
+  formatMusicTime,
+};

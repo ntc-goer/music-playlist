@@ -9,6 +9,7 @@ const MUSIC_TRACK_COLLECTION = "music_tracks"
 
 type MusicTrack struct {
 	ID            primitive.ObjectID `form:"-" json:"id" bson:"_id,omitempty"`
+	StringID      string             `form:"id" json:"-" bson:"-"`
 	Name          string             `form:"name" json:"name,omitempty" bson:"name,omitempty"`
 	Album         string             `form:"album" json:"album,omitempty" bson:"album,omitempty"`
 	Artist        string             `form:"artist" json:"artist,omitempty" bson:"artist,omitempty"`
@@ -19,4 +20,7 @@ type MusicTrack struct {
 	UpdatedAt     time.Time          `form:"-" json:"updatedAt,omitempty" bson:"updatedAt,omitempty"`
 	ThumbnailName string             `form:"-" json:"thumbnailName,omitempty" bson:"thumbnailName,omitempty"`
 	SongFileName  string             `form:"-" json:"songFileName,omitempty" bson:"songFileName,omitempty"`
+
+	File      string `form:"-" json:"-" bson:"-"`
+	Thumbnail string `form:"-" json:"-" bson:"-"`
 }

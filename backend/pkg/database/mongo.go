@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
+	"os"
 	"time"
 )
 
@@ -38,8 +39,17 @@ func (m *MongoDB) Connect() (*mongo.Client, error) {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 
 	connectionStr := connectionStringTemplate
+	host := m.Hosts[0] // use db host configurated in config file
+	if dbHost := os.Getenv("DB_HOST"); dbHost != "" {
+		host = dbHost
+	}
 
-	uri := fmt.Sprintf(connectionStr, m.Username, m.Password, fmt.Sprintf("%s:%s", m.Hosts[0], m.Port), m.Database)
+	port := m.Port // use db port configurated in config file
+	if dbPort := os.Getenv("DB_PORT"); dbPort != "" {
+		port = dbPort
+	}
+
+	uri := fmt.Sprintf(connectionStr, m.Username, m.Password, fmt.Sprintf("%s:%s", host, port), m.Database)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

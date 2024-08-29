@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -42,6 +43,22 @@ func SaveFile(dirPath string, fileName string, data multipart.File) error {
 	// Copy the uploaded file to the destination file
 	if _, err := io.Copy(dst, data); err != nil {
 		return err
+	}
+	return nil
+}
+
+func CreateDirs(dirs []string) error {
+	for _, dir := range dirs {
+		if _, err := os.Open(dir); os.IsNotExist(err) {
+			mkDirErr := os.MkdirAll(dir, 0755)
+			if mkDirErr != nil {
+				return err
+			}
+		} else if os.IsExist(err) {
+			log.Printf("Dir %s exist", dir)
+		} else if err != nil {
+			log.Printf("Error %s", err.Error())
+		}
 	}
 	return nil
 }

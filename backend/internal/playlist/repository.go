@@ -7,6 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"sort"
 	"time"
 )
 
@@ -39,12 +41,56 @@ func (r *Repository) Get(ctx context.Context, keyword string, opts *options.Find
 }
 
 func (r *Repository) GetById(ctx context.Context, id primitive.ObjectID) (*Playlist, error) {
-	res := r.Collection.FindOne(ctx, bson.M{"_id": id})
-	var playlist Playlist
-	if err := res.Decode(&playlist); err != nil {
+	res := r.Collection.FindOne(ctx, bson.M{"_id": id}, nil)
+	var plItem Playlist
+	if err := res.Decode(&plItem); err != nil {
 		return nil, err
 	}
-	return &playlist, nil
+	pipeline := mongo.Pipeline{
+		{{"$match", bson.D{{"_id", id}}}},
+		// $addFields stage
+		{{"$addFields", bson.D{
+			{"songListObjId", bson.D{
+				{"$map", bson.D{
+					{"input", "$songList"},
+					{"as", "songList"},
+					{"in", bson.D{{"$toObjectId", "$$songList"}}},
+				}},
+			}},
+		}}},
+		// $lookup stage
+		{{"$lookup", bson.D{
+			{"from", "music_tracks"},
+			{"localField", "songListObjId"},
+			{"foreignField", "_id"},
+			{"as", "songDetailList"},
+		}}},
+	}
+
+	// Execute the aggregation
+	cursor, err := r.Collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cursor.Close(ctx)
+
+	// Process the results
+	var results []Playlist
+	if err = cursor.All(ctx, &results); err != nil {
+		log.Fatal(err)
+	}
+	if len(results) == 0 {
+		return nil, nil
+	}
+	// Keep the songList
+	orderMap := make(map[string]int)
+	for index, id := range plItem.SongList {
+		orderMap[id] = index
+	}
+	sort.Slice(results[0].SongDetailList, func(i, j int) bool {
+		return orderMap[results[0].SongDetailList[i].ID.Hex()] < orderMap[results[0].SongDetailList[j].ID.Hex()]
+	})
+	return &results[0], nil
 }
 
 func (r *Repository) UpsertMusicPlaylist(ctx context.Context, musicId string, playlistId primitive.ObjectID) error {
@@ -72,5 +118,18 @@ func (r *Repository) Create(ctx context.Context, data *Playlist) (*Playlist, err
 		return nil, err
 	}
 	data.ID = res.InsertedID.(primitive.ObjectID)
+	return data, nil
+}
+
+func (r *Repository) UpdateOne(ctx context.Context, data *Playlist) (*Playlist, error) {
+	data.UpdatedAt = time.Now().UTC()
+	_, err := r.Collection.UpdateOne(ctx, bson.M{
+		"_id": data.ID,
+	}, bson.M{
+		"$set": data,
+	})
+	if err != nil {
+		return nil, err
+	}
 	return data, nil
 }

@@ -1,67 +1,70 @@
 import { Box, Button, Slider, Stack } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getFullUrl } from "../../ultis/common";
+import { formatMusicTime, getFullUrl } from "../../ultis/common";
+import defaultImage from "./../../assets/images/default_image.png"
 
 interface PropsI {
   id: string;
   url: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
   songName: string;
   artist: string;
-  disableNext: boolean
-  disableBefore: boolean
+  playlist?: string
+  disableNext: boolean;
+  disableBefore: boolean;
   isSongPlaying: boolean;
   setSongPlaying: CallableFunction;
-  onChangeSong: CallableFunction
+  onChangeSong: CallableFunction;
+  onEndSong?: CallableFunction
 }
 
 function MusicPlayer({
-  id,
   url,
   thumbnailUrl,
   songName,
   artist,
+  playlist,
   disableNext,
   disableBefore,
   isSongPlaying,
   setSongPlaying,
-  onChangeSong
+  onChangeSong,
+  onEndSong
 }: PropsI) {
   const [duration, setDuration] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
 
   const viewCurrentTime = useMemo(() => {
-    const minute = Math.floor(currentTime / 60);
-    const second = Math.ceil(currentTime % 60);
-    return `${minute < 10 ? `0${minute}` : minute}:${
-      second < 10 ? `0${second}` : second
-    }`;
+    return formatMusicTime(currentTime);
   }, [currentTime]);
 
   const viewDuration = useMemo(() => {
-    const minute = Math.floor(duration / 60);
-    const second = Math.ceil(duration % 60);
-    return `${minute < 10 ? `0${minute}` : minute}:${
-      second < 10 ? `0${second}` : second
-    }`;
+    return formatMusicTime(duration);
   }, [duration]);
+
   useEffect(() => {
     if (audioRef.current) {
       // Update duration when metadata is loaded
       audioRef.current.onloadedmetadata = () => {
         const d = audioRef.current?.duration ?? 0;
-        setDuration(d);
+        setDuration(Math.ceil(d));
       };
 
       const updateCurrentTime = () => {
         if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime);
+          const curTime = Math.ceil(audioRef.current.currentTime)
+          const dur = Math.ceil(audioRef.current?.duration ?? 0)
+          setCurrentTime(curTime);
+          if (curTime === dur) {
+            onEndSong && onEndSong()
+            setSongPlaying(false);
+            audioRef.current.currentTime = 0;
+          }
         }
       };
 
       audioRef.current.ontimeupdate = updateCurrentTime;
-
       handlePlay();
     }
   }, [url]);
@@ -84,7 +87,7 @@ function MusicPlayer({
     isSongPlaying ? handlePause() : handlePlay();
   };
 
-  const handleChangeSlider = (event: Event, newValue: number | number[]) => {
+  const handleChangeSlider = (_event: Event, newValue: number | number[]) => {
     if (audioRef.current) {
       audioRef.current.currentTime =
         typeof newValue == "number" ? newValue : newValue[0];
@@ -104,11 +107,11 @@ function MusicPlayer({
   };
 
   const handleNextSong = () => {
-    onChangeSong("after")
+    onChangeSong("after");
   };
 
   const handleBeforeSong = () => {
-    onChangeSong("before")
+    onChangeSong("before");
   };
   return (
     <Box
@@ -147,7 +150,7 @@ function MusicPlayer({
           }}
         >
           <img
-            src={getFullUrl(thumbnailUrl)}
+            src={thumbnailUrl ? getFullUrl(thumbnailUrl): defaultImage}
             alt=""
             width="88"
             height="88"
@@ -165,7 +168,7 @@ function MusicPlayer({
             }}
           >
             <p style={{ color: "#00bcd4", fontSize: "14px" }}>
-              <abbr title="Episode">Ep.</abbr> 128
+              {playlist}
             </p>
             <h2
               style={{
@@ -227,15 +230,15 @@ function MusicPlayer({
                 <svg width="24" height="24" fill="none">
                   <path
                     d="m10 12 8-6v12l-8-6Z"
-                    fill={disableBefore ? "#808080": "currentColor"}
-                    stroke={disableBefore ? "#808080": "currentColor"}
+                    fill={disableBefore ? "#808080" : "currentColor"}
+                    stroke={disableBefore ? "#808080" : "currentColor"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M6 6v12"
-                    stroke={disableBefore ? "#808080": "currentColor"}
+                    stroke={disableBefore ? "#808080" : "currentColor"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -321,15 +324,15 @@ function MusicPlayer({
                 <svg width="24" height="24" fill="none">
                   <path
                     d="M14 12 6 6v12l8-6Z"
-                    fill={disableNext ? "#808080": "currentColor"}
-                    stroke={disableNext ? "#808080": "currentColor"}
+                    fill={disableNext ? "#808080" : "currentColor"}
+                    stroke={disableNext ? "#808080" : "currentColor"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M18 6v12"
-                    stroke={disableNext ? "#808080": "currentColor"}
+                    stroke={disableNext ? "#808080" : "currentColor"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"

@@ -5,12 +5,14 @@ import (
 	"backend/internal/musictrack"
 	"backend/internal/playlist"
 	"backend/internal/server"
+	"backend/internal/utils"
 	"backend/pkg/database"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/dig"
+	"log"
 )
 
 func provideCoreDependencies() *dig.Container {
@@ -49,7 +51,12 @@ func serverCmd() *cobra.Command {
 		Short: "",
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Init dir contain file
 			var err error
+			err = utils.CreateDirs([]string{cfg.FilePath.Thumbnail, cfg.FilePath.MusicTrack})
+			if err != nil {
+				log.Panic(err)
+			}
 			ctx, cancelFn := context.WithCancel(context.Background())
 			defer cancelFn()
 

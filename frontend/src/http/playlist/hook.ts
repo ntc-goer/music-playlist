@@ -1,9 +1,12 @@
 import { useContext } from "react";
 import { NotificationContext } from "../../components/parts/Notification";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addPlaylistMusic, createPlaylist, getPlaylists } from "./api";
+import { addPlaylistMusic, createPlaylist, getPlaylistById, getPlaylists, updatePlaylist } from "./api";
 
-const useCreatePlaylist = (closePopup: CallableFunction, refetchList: CallableFunction) => {
+const useCreatePlaylist = (
+  closePopup: CallableFunction,
+  refetchList: CallableFunction
+) => {
   const notification = useContext(NotificationContext);
   return useMutation({
     mutationFn: ({ formData }: { formData: FormData }) =>
@@ -14,8 +17,28 @@ const useCreatePlaylist = (closePopup: CallableFunction, refetchList: CallableFu
     },
     onSuccess() {
       closePopup && closePopup();
-      refetchList()
-      notification?.setSuccessMsg("Success");
+      refetchList();
+      notification?.setSuccessMsg("Create Successfully");
+    },
+  });
+};
+
+const useUpdatePlaylist = (
+  closePopup: CallableFunction,
+  refetchList: CallableFunction
+) => {
+  const notification = useContext(NotificationContext);
+  return useMutation({
+    mutationFn: ({ formData }: { formData: FormData }) =>
+      updatePlaylist(formData),
+    onError(error) {
+      closePopup && closePopup();
+      notification?.setErrorMsg(error.message);
+    },
+    onSuccess() {
+      closePopup && closePopup();
+      refetchList();
+      notification?.setSuccessMsg("Update Playlist Successfully");
     },
   });
 };
@@ -30,6 +53,17 @@ const useGetPlaylists = (page: number, pageSize: number, keyword: string) => {
   });
 };
 
+const useGetPlaylistById = (id: string) => {
+  return useQuery({
+    queryKey: ["GET_PLAYLIST_BY_ID", id],
+    select(data) {
+      return data.data;
+    },
+    queryFn: () => getPlaylistById(id),
+    enabled: Boolean(id)
+  });
+};
+
 const useAddPlaylistMusic = (closePopup?: CallableFunction) => {
   const notification = useContext(NotificationContext);
   return useMutation({
@@ -41,9 +75,9 @@ const useAddPlaylistMusic = (closePopup?: CallableFunction) => {
     },
     onSuccess() {
       closePopup && closePopup();
-      notification?.setSuccessMsg("Success");
+      notification?.setSuccessMsg("Add Track To Playlist Successfully");
     },
   });
 };
 
-export { useCreatePlaylist, useGetPlaylists, useAddPlaylistMusic };
+export { useCreatePlaylist, useGetPlaylists, useAddPlaylistMusic, useGetPlaylistById, useUpdatePlaylist };

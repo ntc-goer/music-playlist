@@ -23,7 +23,6 @@ function ImageUpload(props: PropsI) {
   const [imagePreview, setImagePreview] = useState("");
 
   const { onChange, value } = props;
-
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
