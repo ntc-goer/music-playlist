@@ -32,4 +32,9 @@ async function addPlaylistMusic(payload: {
 async function getPlaylistById(id: string){
   return await instance.get(`/playlist/${id}`);
 }
-export { createPlaylist, getPlaylists, addPlaylistMusic,getPlaylistById, updatePlaylist };
+
+async function deletePlaylist(id: string) {
+  return await instance.delete(`/playlist/${id}`);
+}
+
+export { createPlaylist, getPlaylists, addPlaylistMusic,getPlaylistById, updatePlaylist, deletePlaylist };

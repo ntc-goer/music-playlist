@@ -7,11 +7,13 @@ import {
   Button,
 } from "@mui/material";
 import { useDeleteMusicTrack } from "../../http/music/hook";
+import { useDeletePlaylist } from "../../http/playlist/hook";
 
 interface PropsI {
-  songId: string;
+  songId?: string;
+  playlistId?: string;
   onClose: CallableFunction;
-  refetchList: CallableFunction
+  refetchList: CallableFunction;
   message?: string;
 }
 
@@ -20,19 +22,25 @@ function DeleteConfirmPopup({
   message,
   refetchList,
   songId,
+  playlistId,
 }: PropsI) {
-  const deleteMusicTrack = useDeleteMusicTrack({onClose, refetchList});
+  const deleteMusicTrack = useDeleteMusicTrack({ onClose, refetchList });
+  const deletePlaylist = useDeletePlaylist({ onClose, refetchList });
   const handleDeleteSong = () => {
-    deleteMusicTrack.mutate(songId);
+    if (songId) {
+      deleteMusicTrack.mutate(songId);
+    } else if (playlistId) {
+      deletePlaylist.mutate(playlistId);
+    }
   };
   return (
     <Dialog
-      open={Boolean(songId)}
+      open={Boolean(songId) || Boolean(playlistId)}
       onClose={() => onClose()}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Delete music</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Delete Item</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {message || "Do you want to delete this item ?"}

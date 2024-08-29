@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { getFullUrl } from "../../ultis/common";
 import { useAddPlaylistMusic, useGetPlaylists } from "../../http/playlist/hook";
 import { Playlist } from "../../models/playlist";
+import defaultImage from "./../../assets/images/default_image.png";
 
 interface PropsI {
   open: boolean;
@@ -22,7 +23,7 @@ interface PropsI {
 }
 
 function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
-  const { data } = useGetPlaylists(1, 10, "");
+  const { data, refetch } = useGetPlaylists(1, -1, "", musicId);
   const addPlaylistMusic = useAddPlaylistMusic(handleClose);
 
   const [addPlaylistData, setAddPlaylistData] = useState<{
@@ -34,10 +35,12 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
   });
 
   useEffect(() => {
+    console.log("refresh playlist data", data)
     if (data) {
       const ids = data
         .filter((item: Playlist) => item.songList?.includes(musicId))
         ?.map((item: Playlist) => item.id);
+      // console.log("musicId", musicId, "playlist", data)
       setAddPlaylistData({
         ...addPlaylistData,
         musicId,
@@ -45,6 +48,7 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
       });
     }
   }, [data, musicId]);
+
   const onToggleCheckbox = (playlistId: string, checked: boolean) => {
     if (!addPlaylistData.playlistIds.includes(playlistId) && checked) {
       setAddPlaylistData({
@@ -61,6 +65,7 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
   };
 
   const closeDialog = () => {
+    refetch()
     setAddPlaylistData({
       musicId: "",
       playlistIds: [],
@@ -73,6 +78,7 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
       ...addPlaylistData,
       musicId,
     });
+    
   };
   return (
     <Dialog
@@ -97,7 +103,11 @@ function AddMusicToPlaylistPopup({ open, musicId, handleClose }: PropsI) {
             >
               <Stack direction={"row"} alignItems={"center"}>
                 <img
-                  src={getFullUrl(item.thumbnailPath)}
+                  src={
+                    item.thumbnailPath
+                      ? getFullUrl(item.thumbnailPath)
+                      : defaultImage
+                  }
                   alt=""
                   width={"50px"}
                   height={"50px"}

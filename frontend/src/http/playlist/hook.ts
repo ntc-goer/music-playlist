@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { NotificationContext } from "../../components/parts/Notification";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addPlaylistMusic, createPlaylist, getPlaylistById, getPlaylists, updatePlaylist } from "./api";
+import { addPlaylistMusic, createPlaylist, deletePlaylist, getPlaylistById, getPlaylists, updatePlaylist } from "./api";
 
 const useCreatePlaylist = (
   closePopup: CallableFunction,
@@ -43,9 +43,9 @@ const useUpdatePlaylist = (
   });
 };
 
-const useGetPlaylists = (page: number, pageSize: number, keyword: string) => {
+const useGetPlaylists = (page: number, pageSize: number, keyword: string, musicId?: string) => {
   return useQuery({
-    queryKey: ["GET_PLAYLISTS", page, keyword],
+    queryKey: ["GET_PLAYLISTS", page, keyword, musicId],
     select(data) {
       return data.data;
     },
@@ -80,4 +80,26 @@ const useAddPlaylistMusic = (closePopup?: CallableFunction) => {
   });
 };
 
-export { useCreatePlaylist, useGetPlaylists, useAddPlaylistMusic, useGetPlaylistById, useUpdatePlaylist };
+const useDeletePlaylist = ({
+  onClose,
+  refetchList,
+}: {
+  onClose: CallableFunction;
+  refetchList: CallableFunction;
+}) => {
+  const notification = useContext(NotificationContext);
+  return useMutation({
+    mutationFn: (id: string) => deletePlaylist(id),
+    onSuccess() {
+      onClose();
+      refetchList();
+      notification?.setSuccessMsg("Delete successfully");
+    },
+    onError(error) {
+      onClose();
+      notification?.setErrorMsg(error.message);
+    },
+  });
+};
+
+export { useCreatePlaylist, useGetPlaylists, useAddPlaylistMusic, useGetPlaylistById, useUpdatePlaylist, useDeletePlaylist };

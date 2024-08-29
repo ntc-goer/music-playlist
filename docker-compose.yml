@@ -3,8 +3,8 @@ services:
   mongo_db:
     container_name: musictrack_db
     image: mongo:5.0.5
-    # ports:
-    #   - 27018:27017 
+    ports:
+      - 27018:27017 
     environment:
       MONGO_INITDB_DATABASE: musictrack_db
       MONGO_INITDB_USERNAME: admin

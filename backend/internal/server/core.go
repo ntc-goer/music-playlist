@@ -57,4 +57,5 @@ func (c *CoreHTTPServer) AddCoreRouter() {
 	v1.PUT("/playlist", c.Playlist.Update)
 	v1.POST("/playlist", c.Playlist.Create)
 	v1.POST("/playlist/add", c.Playlist.AddTrack)
+	v1.DELETE("/playlist/:id", c.Playlist.Delete)
 }

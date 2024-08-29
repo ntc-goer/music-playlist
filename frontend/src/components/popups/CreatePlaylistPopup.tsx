@@ -36,9 +36,6 @@ function CreatePlaylistPopup({
     name: "",
     thumbnail: null,
   });
-
-  const createPlaylist = useCreatePlaylist(handleClose, refetchList);
-  const updatePlaylist = useUpdatePlaylist(handleClose, refetchList)
   
   useEffect(() => {
     if (editPlaylistItem && editPlaylistItem.id) {
@@ -59,6 +56,9 @@ function CreatePlaylistPopup({
     handleClose && handleClose();
   };
 
+  const createPlaylist = useCreatePlaylist(closeDialog, refetchList);
+  const updatePlaylist = useUpdatePlaylist(closeDialog, refetchList)
+  
   const handleCreatePlaylist = () => {
     const formData = getFormDataFromJSON(playlist);
     if (playlist.id) {

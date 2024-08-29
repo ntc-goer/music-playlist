@@ -4,7 +4,10 @@ import CreatePlaylistPopup from "../../components/popups/CreatePlaylistPopup";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useGetPlaylists } from "../../http/playlist/hook";
 import PlaylistTable from "./PlaylistTable";
-import { ShowPlaylistItemPopup } from "../../components/popups";
+import {
+  DeleteConfirmPopup,
+  ShowPlaylistItemPopup,
+} from "../../components/popups";
 import { Playlist } from "../../models/playlist";
 import { NotificationContext } from "../../components/parts/Notification";
 import { useGetMusicById } from "../../http/music/hook";
@@ -24,6 +27,7 @@ function MyPlayList() {
   );
   const [selectedSongId, setSelectedSongId] = useState("");
   const [isSelectedSongPlaying, setIsSelectedSongPlaying] = useState(false);
+  const [selectedDeletedPlaylistId, setSelectedDeletePlaylistId] = useState("");
 
   const { data, refetch } = useGetPlaylists(1, 10, activeSearchKeyword);
 
@@ -119,6 +123,7 @@ function MyPlayList() {
           setEditPlaylist(row);
           setIsOpenCreatePlaylist(true);
         }}
+        onOpenDeletePopup={(id: string) => setSelectedDeletePlaylistId(id)}
         onSelectShowItems={setShowPlaylistItemId}
       />
       {musicData && (
@@ -151,6 +156,11 @@ function MyPlayList() {
         open={Boolean(showPlaylistItemId)}
         playlistId={showPlaylistItemId}
         onClose={() => setShowPlaylistItemId("")}
+      />
+      <DeleteConfirmPopup
+        playlistId={selectedDeletedPlaylistId}
+        refetchList={refetch}
+        onClose={() => setSelectedDeletePlaylistId("")}
       />
     </Box>
   );

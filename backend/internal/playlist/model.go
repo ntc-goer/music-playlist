@@ -10,7 +10,7 @@ const PLAYLIST_COLLECTION = "playlists"
 
 type Playlist struct {
 	ID             primitive.ObjectID       `form:"-" json:"id" bson:"_id,omitempty"`
-	StringID       string                   `form:"id" json:"_" bson:"_"`
+	StringID       string                   `form:"id" json:"-" bson:"-"`
 	Name           string                   `form:"name" json:"name,omitempty" bson:"name,omitempty"`
 	ThumbnailPath  string                   `form:"-" json:"thumbnailPath,omitempty" bson:"thumbnailPath,omitempty"`
 	SongList       []string                 `form:"-" json:"songList,omitempty" bson:"songList,omitempty"`

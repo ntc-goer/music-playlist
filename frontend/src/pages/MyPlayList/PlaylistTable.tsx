@@ -43,6 +43,7 @@ interface PropsI {
   onPlayPlaylist: CallableFunction;
   onSelectShowItems: CallableFunction;
   onEditPlaylist: CallableFunction;
+  onOpenDeletePopup?: CallableFunction;
 }
 
 export default function PlaylistTable({
@@ -53,9 +54,13 @@ export default function PlaylistTable({
   onPlayPlaylist,
   onPausePlaylist,
   onSelectShowItems,
+  onOpenDeletePopup
 }: PropsI) {
   const handleShowList = (id: string) => {
     onSelectShowItems(id);
+  };
+  const handleDeletePlaylist= (id: string) => {
+    onOpenDeletePopup && onOpenDeletePopup(id);
   };
   return (
     <Paper sx={{ width: "100%", overflow: "hidden", mt: "30px" }}>
@@ -133,7 +138,7 @@ export default function PlaylistTable({
                       </IconButton>
                     </Tooltip>
 
-                    <Tooltip title="Delete playlist">
+                    <Tooltip title="Delete playlist" onClick={() => handleDeletePlaylist(row.id)}>
                       <IconButton>
                         <DeleteIcon
                           color="error"

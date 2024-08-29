@@ -78,6 +78,11 @@ func (s *Service) UpdateOne(ctx context.Context, data *Playlist, thumbnail *util
 }
 
 func (s *Service) AddTrack(ctx context.Context, payload *AddPlaylistPayload) error {
+	// Remove musicId in all playlist
+	err := s.Repository.RemoveMusicFromPlaylist(ctx, payload.MusicId)
+	if err != nil {
+		return err
+	}
 	for _, id := range payload.PlaylistIds {
 		playlistId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {

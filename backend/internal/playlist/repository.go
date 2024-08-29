@@ -106,6 +106,13 @@ func (r *Repository) UpsertMusicPlaylist(ctx context.Context, musicId string, pl
 	return nil
 }
 
+func (r *Repository) RemoveMusicFromPlaylist(ctx context.Context, musicId string) error {
+	_, err := r.Collection.UpdateMany(ctx, bson.M{}, bson.M{"$pull": bson.M{
+		"songList": musicId,
+	}})
+	return err
+}
+
 func (r *Repository) DeleteById(ctx context.Context, id primitive.ObjectID) error {
 	_, err := r.Collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err

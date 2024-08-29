@@ -84,7 +84,10 @@ func GetFindOptions(ctx *gin.Context) *options.FindOptions {
 	pageSizeStr := GetQueryValue(ctx, "pageSize", "10")
 
 	page, _ := strconv.Atoi(pageStr)
+	opts := options.Find()
 	pageSize, _ := strconv.Atoi(pageSizeStr)
-	opts := options.Find().SetLimit(int64(pageSize)).SetSkip((int64(page) - 1) * int64(pageSize))
+	if int64(pageSize) > 0 {
+		opts.SetLimit(int64(pageSize)).SetSkip((int64(page) - 1) * int64(pageSize))
+	}
 	return opts
 }
